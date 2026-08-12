@@ -47,7 +47,7 @@ const heyanfuDetailImporters = import.meta.glob('./assets/heyanfu-detail/*.jpg')
 const nanyushanDetailImporters = import.meta.glob('./assets/nanyushan-detail/*.jpg');
 const huanlehaiwanDetailImporters = import.meta.glob('./assets/huanlehaiwan-detail/*.jpg');
 const fuxishanCover = new URL('./assets/fuxishan-cover.jpg', import.meta.url).href;
-const fuxishanFilm = import.meta.env.VITE_FUXISHAN_FILM_URL || '';
+const fuxishanFilm = import.meta.env.VITE_FUXISHAN_FILM_URL || 'https://github.com/anno-ovo/personal-website/releases/download/video-v1/fuxishan-film.mp4';
 
 const contact = {
   phone: '19049588249',
