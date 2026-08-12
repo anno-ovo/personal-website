@@ -423,11 +423,11 @@ function revealHeroFallback() {
         return;
       }
 
-      element.style.opacity = '1';
-      element.style.visibility = 'visible';
-      element.style.clipPath = 'none';
-      element.style.transform = 'none';
-      element.style.filter = 'none';
+      element.style.opacity = '';
+      element.style.visibility = '';
+      element.style.clipPath = '';
+      element.style.transform = '';
+      element.style.filter = '';
     });
   });
 
@@ -461,7 +461,7 @@ function usePortfolioMotion(skipOpening = false) {
       gsap.set('.heroVideo', { scale: 1.04, filter: 'grayscale(1) contrast(1.18) brightness(0.46)' });
       gsap.set('.scanField', { xPercent: 0, autoAlpha: 0.72 });
       gsap.set('.grain', { autoAlpha: 0.22 });
-      gsap.set('.openingCurtain', { autoAlpha: 0, display: 'none' });
+      gsap.set('.openingCurtain', { autoAlpha: 0 });
 
       if (!skipOpening) {
         const opening = gsap.timeline({ delay: 0.2 });
@@ -556,8 +556,11 @@ function usePortfolioMotion(skipOpening = false) {
         scrollTrigger: { trigger: '.finalContact', start: 'top 70%', once: true },
       });
       });
+
+      window.clearTimeout(fallbackTimer);
     } catch (error) {
       console.warn('Portfolio motion setup failed:', error);
+      window.clearTimeout(fallbackTimer);
       revealHeroFallback();
     }
 
