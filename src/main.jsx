@@ -444,34 +444,54 @@ function usePortfolioMotion(skipOpening = false) {
       ctx = gsap.context(() => {
         gsap.defaults({ ease: 'power4.out', force3D: true });
 
-      gsap.set('.nav', { autoAlpha: 1, y: 0 });
-      gsap.set('.hero .kicker', { autoAlpha: 1, y: 0 });
-      gsap.set('.heroLanyard', { autoAlpha: 1, y: 0, scale: 1 });
-      gsap.set('.heroMeta .border-glow-card', { autoAlpha: 1, y: 0 });
-      gsap.set('.hero h1', { clipPath: 'inset(0 0 0% 0)', y: 0, scaleY: 1, transformOrigin: '50% 100%' });
-      gsap.set('.heroGreeting, .heroTagline', { clipPath: 'inset(0 0 0% 0)', y: 0, scaleY: 1, transformOrigin: '50% 100%' });
-      gsap.set('.heroVideo', { scale: 1.04, filter: 'grayscale(1) contrast(1.18) brightness(0.46)' });
-      gsap.set('.scanField', { xPercent: 0, autoAlpha: 0.72 });
-      gsap.set('.grain', { autoAlpha: 0.22 });
-      gsap.set('.openingCurtain', { autoAlpha: 0 });
+      if (skipOpening) {
+        gsap.set('.openingCurtain', { display: 'none', autoAlpha: 0, pointerEvents: 'none' });
+        gsap.set(
+          '.nav, .hero .kicker, .heroLanyard, .heroMeta .border-glow-card, .hero h1, .heroGreeting, .heroTagline, .heroVideo, .scanField, .grain',
+          { clearProps: 'all' },
+        );
+      } else {
+        gsap.set('.nav', { autoAlpha: 0, y: -18 });
+        gsap.set('.hero .kicker', { autoAlpha: 0, y: 22 });
+        gsap.set('.heroLanyard', { autoAlpha: 0, y: -120, scale: 0.99 });
+        gsap.set('.heroMeta .border-glow-card', { autoAlpha: 0, y: 24 });
+        gsap.set('.hero h1', { clipPath: 'inset(0 0 100% 0)', y: 56, scaleY: 0.96, transformOrigin: '50% 100%' });
+        gsap.set('.heroGreeting, .heroTagline', { clipPath: 'inset(0 0 100% 0)', y: 40, scaleY: 0.96, transformOrigin: '50% 100%' });
+        gsap.set('.heroVideo', { scale: 1.04, filter: 'grayscale(1) contrast(1.18) brightness(0.46)' });
+        gsap.set('.scanField', { xPercent: 0, autoAlpha: 0.72 });
+        gsap.set('.grain', { autoAlpha: 0.22 });
+        gsap.set('.openingCurtain', { autoAlpha: 0 });
 
-      if (!skipOpening) {
-        const opening = gsap.timeline({ delay: 0.2 });
+        const opening = gsap.timeline({ delay: 0.15 });
+        const progress = { value: 0 };
+
         opening
-          .fromTo('.openingCurtain', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.01 }, 0)
-          .fromTo('.openingCurtain span', { yPercent: 120, autoAlpha: 0 }, { yPercent: 0, autoAlpha: 1, duration: 0.65, ease: 'expo.out' }, 0)
-          .fromTo('.openingCurtain i', { scaleX: 0, transformOrigin: '0% 50%' }, { scaleX: 1, duration: 0.7, ease: 'expo.inOut' }, 0.05)
-          .to('.openingCurtain', { clipPath: 'inset(0 0 100% 0)', duration: 0.65, ease: 'expo.inOut' }, 0.42)
-          .set('.openingCurtain', { display: 'none', autoAlpha: 0 })
-          .to('.grain', { autoAlpha: 0.22, duration: 0.5 }, 0)
-          .to('.scanField', { autoAlpha: 0.72, xPercent: 0, duration: 0.8, ease: 'expo.out' }, 0)
-          .to('.heroVideo', { scale: 1.04, filter: 'grayscale(1) contrast(1.18) brightness(0.46)', duration: 1.1, ease: 'power3.out' }, 0)
-          .to('.nav', { autoAlpha: 1, y: 0, duration: 0.4 }, 0.08)
-          .to('.hero .kicker', { autoAlpha: 1, y: 0, duration: 0.35 }, 0.12)
-          .to('.hero h1', { clipPath: 'inset(0 0 0% 0)', y: 0, scaleY: 1, duration: 0.55, ease: 'expo.out' }, 0.18)
-          .to('.heroGreeting, .heroTagline', { clipPath: 'inset(0 0 0% 0)', y: 0, scaleY: 1, duration: 0.5, stagger: 0.06, ease: 'expo.out' }, 0.26)
-          .fromTo('.heroLanyard', { autoAlpha: 0, y: -120, scale: 0.99 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.32, ease: 'back.out(1.1)' }, 0.32)
-          .to('.heroMeta .border-glow-card', { autoAlpha: 1, y: 0, duration: 0.4, stagger: 0.05 }, 0.34);
+          .set('.openingCurtain', { autoAlpha: 1, pointerEvents: 'auto' }, 0)
+          .fromTo('.introBrand', { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: 'expo.out' }, 0)
+          .fromTo('.introWord', { clipPath: 'inset(0 0 100% 0)', y: 26 }, { clipPath: 'inset(0 0 0% 0)', y: 0, duration: 0.65, ease: 'expo.out' }, 0.05)
+          .fromTo('.introCaption', { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.45 }, 0.55)
+          .to(progress, {
+            value: 100,
+            duration: 1,
+            ease: 'power2.inOut',
+            onUpdate: () => {
+              const percent = document.querySelector('.introPercent');
+              const bar = document.querySelector('.introBar');
+              if (percent) percent.textContent = String(Math.round(progress.value));
+              if (bar) bar.style.transform = `scaleX(${progress.value / 100})`;
+            },
+          }, 0.15)
+          .to('.openingCurtain', { clipPath: 'inset(0 0 100% 0)', duration: 0.6, ease: 'expo.inOut' }, 1.3)
+          .set('.openingCurtain', { display: 'none', autoAlpha: 0, pointerEvents: 'none' })
+          .to('.grain', { autoAlpha: 0.22, duration: 0.5 }, 1.38)
+          .to('.scanField', { autoAlpha: 0.72, xPercent: 0, duration: 0.8, ease: 'expo.out' }, 1.38)
+          .to('.heroVideo', { scale: 1.04, filter: 'grayscale(1) contrast(1.18) brightness(0.46)', duration: 1.1, ease: 'power3.out' }, 1.4)
+          .to('.nav', { autoAlpha: 1, y: 0, duration: 0.45 }, 1.45)
+          .to('.hero .kicker', { autoAlpha: 1, y: 0, duration: 0.4 }, 1.5)
+          .to('.hero h1', { clipPath: 'inset(0 0 0% 0)', y: 0, scaleY: 1, duration: 0.6, ease: 'expo.out' }, 1.55)
+          .to('.heroGreeting, .heroTagline', { clipPath: 'inset(0 0 0% 0)', y: 0, scaleY: 1, duration: 0.55, stagger: 0.07, ease: 'expo.out' }, 1.6)
+          .fromTo('.heroLanyard', { autoAlpha: 0, y: -120, scale: 0.99 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.38, ease: 'back.out(1.1)' }, 1.66)
+          .to('.heroMeta .border-glow-card', { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.05 }, 1.7);
       }
 
       const titleTargets = gsap.utils.toArray('.profileCopy h2, .experienceDepth .sectionHeader h2, .works .sectionHeader h2, .strengths .sectionHeader h2, .finalInner h2');
@@ -614,8 +634,18 @@ function HomePage({ route }) {
   return (
     <>
       <div className={`openingCurtain ${skipOpening ? 'isHidden' : ''}`} aria-hidden="true">
-        <span>SoundShape / Portfolio System</span>
-        <i />
+        <div className="introCenter">
+          <div className="introBrand">
+            <img src={personalLogo} alt="" />
+            <span className="introWord">SoundShape</span>
+          </div>
+          <div className="introProgress">
+            <span className="introPercent">0</span>
+            <span className="introUnit">%</span>
+          </div>
+          <div className="introTrack"><i className="introBar" /></div>
+          <span className="introCaption">Portfolio System / Loading</span>
+        </div>
       </div>
       <SiteNav />
       <main>
