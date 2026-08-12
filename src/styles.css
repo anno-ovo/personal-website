@@ -525,7 +525,7 @@ p {
 
 .heroTitleRow {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
+  grid-template-columns: minmax(0, 1fr);
   align-items: end;
   gap: 44px;
 }
@@ -557,10 +557,10 @@ p {
 }
 
 h1 {
-  max-width: 1280px;
+  max-width: 1600px;
   margin: 24px 0 42px;
   font-family: Inter, "HarmonyOS Sans SC", "Microsoft YaHei", Arial, sans-serif;
-  font-size: clamp(36px, 3.7vw, 68px);
+  font-size: clamp(46.8px, 4.81vw, 88.4px);
   line-height: 1.08;
   font-weight: 500;
   letter-spacing: 0;
@@ -587,7 +587,7 @@ h1 {
   margin-top: 0;
   color: #f4fbfa;
   font-family: "默陌专辑手写体", "MoMo Album Handwriting", "MomoAlbumHandwriting", "STXingkai", "华文行楷", "KaiTi", "楷体", cursive;
-  font-size: clamp(40px, 4.35vw, 78px);
+  font-size: clamp(52px, 5.655vw, 101.4px);
   line-height: 1.14;
   font-weight: 400;
   text-shadow: 0 0 34px rgba(142, 232, 223, 0.16);
@@ -597,7 +597,7 @@ h1 {
   display: block;
   color: rgba(238, 242, 242, 0.95);
   font-family: "LogoSCUnboundedSans", Inter, "HarmonyOS Sans SC", "Microsoft YaHei", Arial, sans-serif;
-  font-size: clamp(28px, 3.25vw, 58px);
+  font-size: clamp(36.4px, 4.225vw, 75.4px);
   line-height: 0.98;
   font-weight: 400;
   margin-top: 18px;
@@ -1895,7 +1895,7 @@ body.isDetailRoute .bookFigure img {
   }
 
   h1 {
-    font-size: 38px;
+    font-size: 49.4px;
   }
 
   .heroGreeting {
@@ -1905,11 +1905,11 @@ body.isDetailRoute .bookFigure img {
   }
 
   .heroGreeting .handName {
-    font-size: 54px;
+    font-size: 70.2px;
   }
 
   .heroTagline {
-    font-size: 31px;
+    font-size: 40.3px;
   }
 
   .heroTitleRow {
