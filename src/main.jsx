@@ -47,7 +47,7 @@ const heyanfuDetailImporters = import.meta.glob('./assets/heyanfu-detail/*.jpg')
 const nanyushanDetailImporters = import.meta.glob('./assets/nanyushan-detail/*.jpg');
 const huanlehaiwanDetailImporters = import.meta.glob('./assets/huanlehaiwan-detail/*.jpg');
 const fuxishanCover = new URL('./assets/fuxishan-cover.jpg', import.meta.url).href;
-const fuxishanFilm = import.meta.env.VITE_FUXISHAN_FILM_URL || 'https://github.com/anno-ovo/personal-website/releases/download/video-v1/fuxishan-film.mp4';
+const fuxishanFilm = new URL('./assets/fuxishan-film.mp4', import.meta.url).href;
 
 const contact = {
   phone: '19049588249',
@@ -949,7 +949,7 @@ function FuxishanDetailPage() {
       </header>
       <main className="wrap videoDetailMain" aria-label="伏羲山宣传片详情">
         <div className="videoStage">
-          <video className="projectVideo" src={fuxishanFilm || undefined} poster={fuxishanCover} controls playsInline preload="metadata" />
+          <video className="projectVideo" src={fuxishanFilm} poster={fuxishanCover} controls playsInline preload="metadata" />
         </div>
         <div className="videoDetailCopy">
           <a className="detailReturnHome videoReturnHome" href="#top" onClick={handleBackHome}>返回首页</a>
