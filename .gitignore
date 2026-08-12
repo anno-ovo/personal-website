@@ -7,5 +7,3 @@ vite.out.log
 vite.err.log
 src/*.recovered-*
 src/*.corrupt-*
-# 162 MB video exceeds GitHub's 100 MB file limit
-src/assets/fuxishan-film.mp4
