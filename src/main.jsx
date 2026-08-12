@@ -436,15 +436,7 @@ function revealHeroFallback() {
 
 function usePortfolioMotion(skipOpening = false) {
   useLayoutEffect(() => {
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const fallbackTimer = window.setTimeout(revealHeroFallback, 1800);
-
-    if (reduceMotion) {
-      gsap.set('.heroLanyard', { autoAlpha: 1, y: 0, scale: 1 });
-      revealHeroFallback();
-      window.clearTimeout(fallbackTimer);
-      return undefined;
-    }
 
     let ctx;
 
