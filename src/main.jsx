@@ -1002,7 +1002,6 @@ function SiteNav() {
 
 function Hero() {
   const videoRefA = React.useRef(null);
-  const [lanyardReady, setLanyardReady] = useState(false);
 
   useEffect(() => {
     const videoA = videoRefA.current;
@@ -1025,16 +1024,11 @@ function Hero() {
     return () => videoA.removeEventListener('loadedmetadata', setupWhenReady);
   }, []);
 
-  useEffect(() => {
-    const timer = window.setTimeout(() => setLanyardReady(true), 1800);
-    return () => window.clearTimeout(timer);
-  }, []);
-
   return (
     <section className="hero" id="top" aria-label="首页">
       <LanyardErrorBoundary>
         <Suspense fallback={null}>
-          {lanyardReady ? <HeroLanyard /> : null}
+          <HeroLanyard />
         </Suspense>
       </LanyardErrorBoundary>
       <div className="videoBackdrop" aria-hidden="true">
@@ -1088,7 +1082,7 @@ function Profile() {
   return (
     <section className="section profile wrap" id="profile">
       <div className="portraitPanel">
-        <img className="portraitPhoto" src={profilePhoto} alt="郑贾磊肖像" loading="lazy" decoding="async" />
+        <img className="portraitPhoto" src={profilePhoto} alt="郑贾磊肖像" />
         <div className="portraitGlow" aria-hidden="true" />
         <div className="portrait"><span>郑贾磊</span></div>
       </div>
@@ -1326,7 +1320,7 @@ function Contact() {
               <span className="wechatItem"><span>WeChat:</span>{contact.wechat}</span>
             </BorderGlow>
             <div className={`wechatPopup ${wechatPreviewOpen ? 'isVisible' : ''}`} aria-hidden="true">
-              <img src={wechatHoverImage} alt="WeChat QR code preview" loading="lazy" decoding="async" />
+              <img src={wechatHoverImage} alt="WeChat QR code preview" />
             </div>
           </div>
         </div>
