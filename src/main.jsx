@@ -605,6 +605,8 @@ function DetailLoader({ ready = false, timeout = 6000 }) {
     const overlay = overlayRef.current;
     if (!overlay || doneRef.current) return undefined;
 
+    gsap.set(overlay, { autoAlpha: 1, pointerEvents: 'auto' });
+
     const percent = overlay.querySelector('.introPercent');
     const bar = overlay.querySelector('.introBar');
     const progress = { value: 0 };
