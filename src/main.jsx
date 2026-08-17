@@ -263,6 +263,43 @@ function useImportedImages(importers, { sliceStart = 0, sliceEnd = undefined, ex
   return images;
 }
 
+function useDetailImageProgress(images, preloadCount = 4) {
+  const [progress, setProgress] = useState(0);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    setProgress(0);
+    setReady(false);
+
+    const targetCount = Math.min(preloadCount, images.length);
+    if (targetCount === 0) return () => {
+      cancelled = true;
+    };
+
+    let loaded = 0;
+    const markLoaded = () => {
+      if (cancelled) return;
+      loaded += 1;
+      setProgress(Math.round((loaded / targetCount) * 100));
+      if (loaded >= targetCount) setReady(true);
+    };
+
+    images.slice(0, targetCount).forEach((src) => {
+      const img = new Image();
+      img.onload = markLoaded;
+      img.onerror = markLoaded;
+      img.src = src;
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [images, preloadCount]);
+
+  return { progress, ready };
+}
+
 const homeReturnStateKey = 'soundshape:home-return-state';
 const detailRouteHashes = new Set(['#/projects/heyanfu', '#/projects/nanyushan', '#/projects/huanlehaiwan', '#/projects/fuxishan']);
 
@@ -583,21 +620,16 @@ function usePortfolioMotion(skipOpening = false) {
   }, []);
 }
 
-function DetailLoader({ ready = false, timeout = 6000 }) {
+function DetailLoader({ progress = 0, ready = false, timeout = 20000 }) {
   const overlayRef = useRef(null);
   const [done, setDone] = useState(false);
   const [forceReady, setForceReady] = useState(false);
-  const readyAtRef = useRef(0);
   const doneRef = useRef(false);
 
   useEffect(() => {
     const timer = window.setTimeout(() => setForceReady(true), timeout);
     return () => window.clearTimeout(timer);
   }, [timeout]);
-
-  useEffect(() => {
-    if (ready && !readyAtRef.current) readyAtRef.current = Date.now();
-  }, [ready]);
 
   const effectiveReady = ready || forceReady;
 
@@ -606,33 +638,21 @@ function DetailLoader({ ready = false, timeout = 6000 }) {
     if (!overlay || doneRef.current) return undefined;
 
     gsap.set(overlay, { autoAlpha: 1, pointerEvents: 'auto' });
+  }, []);
 
+  useEffect(() => {
+    const overlay = overlayRef.current;
+    if (!overlay) return undefined;
     const percent = overlay.querySelector('.introPercent');
     const bar = overlay.querySelector('.introBar');
-    const progress = { value: 0 };
-
-    const updateProgress = () => {
-      const value = Math.round(progress.value);
-      if (percent) percent.textContent = String(value);
-      if (bar) bar.style.transform = `scaleX(${progress.value / 100})`;
-    };
-
-    const progressTween = gsap.to(progress, {
-      value: 100,
-      duration: 1.2,
-      ease: 'power2.inOut',
-      onUpdate: updateProgress,
-    });
-
-    return () => progressTween.kill();
-  }, []);
+    if (percent) percent.textContent = String(Math.round(progress));
+    if (bar) bar.style.transform = `scaleX(${progress / 100})`;
+  }, [progress]);
 
   useEffect(() => {
     if (!effectiveReady || doneRef.current) return undefined;
 
     const overlay = overlayRef.current;
-    const startedAt = readyAtRef.current || Date.now();
-    const delay = startedAt > 0 && Date.now() - startedAt > 900 ? 350 : 1100;
 
     const timer = window.setTimeout(() => {
       const tl = gsap.timeline();
@@ -642,7 +662,7 @@ function DetailLoader({ ready = false, timeout = 6000 }) {
           doneRef.current = true;
           setDone(true);
         });
-    }, delay);
+    }, 400);
 
     return () => window.clearTimeout(timer);
   }, [effectiveReady]);
@@ -778,6 +798,7 @@ function HeYanFuDetailPage({ routeKey }) {
     sliceEnd: -1,
     excludePageNumbers: ['19', '22', '25', '28', '32', '37'],
   });
+  const { progress: heyanfuProgress, ready: heyanfuReady } = useDetailImageProgress(heyanfuDetailImages, 4);
 
   const handleBackHome = (event) => {
     event.preventDefault();
@@ -806,7 +827,7 @@ function HeYanFuDetailPage({ routeKey }) {
 
   return (
     <div className="detailPage">
-      <DetailLoader ready={heyanfuDetailImages.length > 0} />
+      <DetailLoader progress={heyanfuProgress} ready={heyanfuReady} />
       <header className="detailHero">
         <div className="wrap detailNav">
           <a className="detailBack" href="#top" onClick={handleBackHome}>← 返回首页</a>
@@ -851,6 +872,7 @@ function HuanlehaiwanDetailPage({ routeKey }) {
     sliceEnd: -1,
     excludeFileNames: ['-_页面_71.jpg', '-_页面_72.jpg', '-_页面_74.jpg', '-_页面_75.jpg'],
   });
+  const { progress: huanlehaiwanProgress, ready: huanlehaiwanReady } = useDetailImageProgress(huanlehaiwanDetailImages, 4);
 
   const handleBackHome = (event) => {
     event.preventDefault();
@@ -879,7 +901,7 @@ function HuanlehaiwanDetailPage({ routeKey }) {
 
   return (
     <div className="detailPage huanlehaiwanDetailPage">
-      <DetailLoader ready={huanlehaiwanDetailImages.length > 0} />
+      <DetailLoader progress={huanlehaiwanProgress} ready={huanlehaiwanReady} />
       <header className="detailHero">
         <div className="wrap detailNav">
           <a className="detailBack" href="#top" onClick={handleBackHome}>← 返回首页</a>
@@ -920,6 +942,7 @@ function HuanlehaiwanDetailPage({ routeKey }) {
 function NanyushanDetailPage({ routeKey }) {
   const [stackKey, setStackKey] = useState(0);
   const nanyushanDetailImages = useImportedImages(nanyushanDetailImporters, { sliceStart: 1, sliceEnd: -1 });
+  const { progress: nanyushanProgress, ready: nanyushanReady } = useDetailImageProgress(nanyushanDetailImages, 4);
 
   const handleBackHome = (event) => {
     event.preventDefault();
@@ -948,7 +971,7 @@ function NanyushanDetailPage({ routeKey }) {
 
   return (
     <div className="detailPage bookDetailPage">
-      <DetailLoader ready={nanyushanDetailImages.length > 0} />
+      <DetailLoader progress={nanyushanProgress} ready={nanyushanReady} />
       <header className="detailHero">
         <div className="wrap detailNav">
           <a className="detailBack" href="#top" onClick={handleBackHome}>← 返回首页</a>
@@ -1027,7 +1050,7 @@ function FuxishanDetailPage() {
 
   return (
     <div className="detailPage videoDetailPage">
-      <DetailLoader ready={videoReady} />
+      <DetailLoader progress={videoReady ? 100 : 35} ready={videoReady} />
       <header className="detailHero">
         <div className="wrap detailNav">
           <a className="detailBack" href="#top" onClick={handleBackHome}>← 返回首页</a>
