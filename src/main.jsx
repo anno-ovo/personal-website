@@ -1,4 +1,4 @@
-import React, { Suspense, lazy, useEffect, useLayoutEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -583,6 +583,86 @@ function usePortfolioMotion(skipOpening = false) {
   }, []);
 }
 
+function DetailLoader({ ready = false, timeout = 6000 }) {
+  const overlayRef = useRef(null);
+  const [done, setDone] = useState(false);
+  const [forceReady, setForceReady] = useState(false);
+  const readyAtRef = useRef(0);
+  const doneRef = useRef(false);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setForceReady(true), timeout);
+    return () => window.clearTimeout(timer);
+  }, [timeout]);
+
+  useEffect(() => {
+    if (ready && !readyAtRef.current) readyAtRef.current = Date.now();
+  }, [ready]);
+
+  const effectiveReady = ready || forceReady;
+
+  useEffect(() => {
+    const overlay = overlayRef.current;
+    if (!overlay || doneRef.current) return undefined;
+
+    const percent = overlay.querySelector('.introPercent');
+    const bar = overlay.querySelector('.introBar');
+    const progress = { value: 0 };
+
+    const updateProgress = () => {
+      const value = Math.round(progress.value);
+      if (percent) percent.textContent = String(value);
+      if (bar) bar.style.transform = `scaleX(${progress.value / 100})`;
+    };
+
+    const progressTween = gsap.to(progress, {
+      value: 100,
+      duration: 1.2,
+      ease: 'power2.inOut',
+      onUpdate: updateProgress,
+    });
+
+    return () => progressTween.kill();
+  }, []);
+
+  useEffect(() => {
+    if (!effectiveReady || doneRef.current) return undefined;
+
+    const overlay = overlayRef.current;
+    const startedAt = readyAtRef.current || Date.now();
+    const delay = startedAt > 0 && Date.now() - startedAt > 900 ? 350 : 1100;
+
+    const timer = window.setTimeout(() => {
+      const tl = gsap.timeline();
+      tl.to(overlay, { clipPath: 'inset(0 0 100% 0)', duration: 0.65, ease: 'expo.inOut' })
+        .set(overlay, { display: 'none', autoAlpha: 0, pointerEvents: 'none' })
+        .eventCallback('onComplete', () => {
+          doneRef.current = true;
+          setDone(true);
+        });
+    }, delay);
+
+    return () => window.clearTimeout(timer);
+  }, [effectiveReady]);
+
+  return (
+    <div className={`openingCurtain detailLoader ${done ? 'isHidden' : ''}`} ref={overlayRef} aria-hidden="true">
+      <div className="introCenter">
+        <div className="introBrand">
+          <img src={personalLogo} alt="" />
+          <span className="introWord">SoundShape</span>
+        </div>
+        <div className="introProgress">
+          <span className="introPercent">0</span>
+          <span className="introUnit">%</span>
+        </div>
+        <div className="introTrack"><i className="introBar" /></div>
+        <span className="introCaption">Loading project</span>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const { hash: route, routeKey } = useHashRoute();
   const isDetailRoute = detailRouteHashes.has(route);
@@ -724,6 +804,7 @@ function HeYanFuDetailPage({ routeKey }) {
 
   return (
     <div className="detailPage">
+      <DetailLoader ready={heyanfuDetailImages.length > 0} />
       <header className="detailHero">
         <div className="wrap detailNav">
           <a className="detailBack" href="#top" onClick={handleBackHome}>← 返回首页</a>
@@ -796,6 +877,7 @@ function HuanlehaiwanDetailPage({ routeKey }) {
 
   return (
     <div className="detailPage huanlehaiwanDetailPage">
+      <DetailLoader ready={huanlehaiwanDetailImages.length > 0} />
       <header className="detailHero">
         <div className="wrap detailNav">
           <a className="detailBack" href="#top" onClick={handleBackHome}>← 返回首页</a>
@@ -864,6 +946,7 @@ function NanyushanDetailPage({ routeKey }) {
 
   return (
     <div className="detailPage bookDetailPage">
+      <DetailLoader ready={nanyushanDetailImages.length > 0} />
       <header className="detailHero">
         <div className="wrap detailNav">
           <a className="detailBack" href="#top" onClick={handleBackHome}>← 返回首页</a>
@@ -908,10 +991,16 @@ function NanyushanDetailPage({ routeKey }) {
 }
 
 function FuxishanDetailPage() {
+  const [videoReady, setVideoReady] = useState(false);
   const handleBackHome = (event) => {
     event.preventDefault();
     goHome();
   };
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setVideoReady(true), 3000);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useLayoutEffect(() => {
     const previousScrollRestoration = window.history.scrollRestoration;
@@ -936,6 +1025,7 @@ function FuxishanDetailPage() {
 
   return (
     <div className="detailPage videoDetailPage">
+      <DetailLoader ready={videoReady} />
       <header className="detailHero">
         <div className="wrap detailNav">
           <a className="detailBack" href="#top" onClick={handleBackHome}>← 返回首页</a>
@@ -949,7 +1039,16 @@ function FuxishanDetailPage() {
       </header>
       <main className="wrap videoDetailMain" aria-label="伏羲山宣传片详情">
         <div className="videoStage">
-          <video className="projectVideo" src={fuxishanFilm} poster={fuxishanCover} controls playsInline preload="metadata" />
+          <video
+            className="projectVideo"
+            src={fuxishanFilm}
+            poster={fuxishanCover}
+            controls
+            playsInline
+            preload="metadata"
+            onLoadedMetadata={() => setVideoReady(true)}
+            onCanPlay={() => setVideoReady(true)}
+          />
         </div>
         <div className="videoDetailCopy">
           <a className="detailReturnHome videoReturnHome" href="#top" onClick={handleBackHome}>返回首页</a>

@@ -103,6 +103,10 @@ img {
   opacity: 1;
 }
 
+.detailLoader {
+  z-index: 9000;
+}
+
 .introCenter {
   position: relative;
   z-index: 1;
